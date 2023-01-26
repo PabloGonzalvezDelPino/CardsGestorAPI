@@ -17,6 +17,7 @@ use App\Http\Controllers\UsersController;
 Route::prefix('/users')->group(function(){
     Route::post('/login', [UsersController::class, 'login']);
     Route::put('/register', [UsersController::class, 'register']);
+    Route::post('/recoverPass', [UsersController::class, 'recoverPass']);
 });
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
