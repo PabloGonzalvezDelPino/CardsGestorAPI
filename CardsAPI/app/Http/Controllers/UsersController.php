@@ -60,7 +60,7 @@ class UsersController extends Controller
                        $user->tokens()->delete();
 
    
-                       $token = $user->createToken($user->username);
+                       $token = $user->createToken($user->username,[$user->type]);
                        //$token = $user->createToken($data->type,['server:update'])->plainTextToken;
                        return ResponseGenerator::generateResponse("OK", 200, $token->plainTextToken, "Login correcto");
                    }
