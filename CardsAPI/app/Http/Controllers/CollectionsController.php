@@ -13,7 +13,7 @@ use App\Models\Collection;
 
 class CollectionsController extends Controller
 {
-    public function add(Request $request){
+    public function create(Request $request){
         $json = $request->getContent();
         $data = json_decode($json);
 

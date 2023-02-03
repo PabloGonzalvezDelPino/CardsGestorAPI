@@ -22,10 +22,11 @@ Route::prefix('/users')->group(function(){
     Route::post('/recoverPass', [UsersController::class, 'recoverPass']);
 });
 Route::prefix('/cards')->group(function(){
-    Route::put('/add', [CardsController::class, 'add']);
+    Route::middleware(['auth:sanctum','ability:Administrador'])->put('/create', [CardsController::class, 'create']);
+    Route::middleware(['auth:sanctum','ability:Administrador'])->put('/addToCollection', [CardsController::class, 'addToCollection']);
 });
 Route::prefix('/collections')->group(function(){
-    Route::middleware(['auth:sanctum','ability:Administrador'])->put('/add', [CollectionsController::class, 'add']);
+    Route::middleware(['auth:sanctum','ability:Administrador'])->put('/create', [CollectionsController::class, 'create']);
 });
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
