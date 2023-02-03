@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Helpers\ResponseGenerator;
 use App\Models\Card;
 use App\Models\Collection;
@@ -19,8 +20,7 @@ class CollectionsController extends Controller
         if($data){
             $validate = Validator::make(json_decode($json,true), [
                 'name' => 'required|string',
-                'description' => 'required|string',
-                'collection_id' => 'required|exists:collection,id'
+                'image' => 'required|string',
             ]);
             if($validate->fails()){
                 return ResponseGenerator::generateResponse("KO", 422, null, $validate->errors());
@@ -28,9 +28,9 @@ class CollectionsController extends Controller
 
                 $collection = new Collection();
                 $collection->name = $data->name;
-                $collection->image = $data->description;
-                $card = Card::find($data->card_id);
-                if($card){
+                $collection->image = $data->image;
+                if(isset($data->card_id)){
+                    $card = Card::find($data->card_id);
                     $collection->cards()->attach($data->card_id);
                     try{
                         $collection->save();
@@ -42,13 +42,15 @@ class CollectionsController extends Controller
                     $card = new Card();
                     $card->name = $data->card_name;
                     $card->description = $data->card_description;
+                    //$actualUserId = Auth::id();
                     try{
                         $card->save();
+                        $collection->save(); 
                         $collection->cards()->attach($card->id);
-                        $collection->save();
-                        return ResponseGenerator::generateResponse("OK", 200, $card, "Collección guardada correctamente");
+                        
+                        return ResponseGenerator::generateResponse("OK", 200, $collection, "Collección guardada correctamente");
                     }catch(\Exception $e){
-                        return ResponseGenerator::generateResponse("KO", 304, null, "Error al guardar");
+                        return ResponseGenerator::generateResponse("KO", 304, $e, "Error al crear y guardar");
                     }
                 }else{
                     return ResponseGenerator::generateResponse("KO", 404, null, "No se ha encontrado ninguna carta");

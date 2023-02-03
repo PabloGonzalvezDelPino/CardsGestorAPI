@@ -58,10 +58,7 @@ class UsersController extends Controller
                        return ResponseGenerator::generateResponse("KO", 404, null, "Login incorrecto, comprueba la contraseña");
                    }else{
                        $user->tokens()->delete();
-
-   
                        $token = $user->createToken($user->username,[$user->type]);
-                       //$token = $user->createToken($data->type,['server:update'])->plainTextToken;
                        return ResponseGenerator::generateResponse("OK", 200, $token->plainTextToken, "Login correcto");
                    }
                }catch(\Exception $e){

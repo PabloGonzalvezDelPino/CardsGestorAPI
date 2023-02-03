@@ -7,11 +7,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Card;
+use App\Models\Collection;
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    public function cards(){
+        return $this->belongsToMany(Card::class);
+    }
+    public function collections(){
+        return $this->belongsToMany(Collection::class);
+    }
     /**
      * The attributes that are mass assignable.
      *
