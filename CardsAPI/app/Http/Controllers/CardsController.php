@@ -32,7 +32,7 @@ class CardsController extends Controller
                     $card = new Card();
                     $card->name = $data->name;
                     $card->description = $data->description;
-                    $card->collection_id = $data->collection_id;
+                    $card->collections()->attach($data->collection_id);
 
                     try{
                         $card->save();

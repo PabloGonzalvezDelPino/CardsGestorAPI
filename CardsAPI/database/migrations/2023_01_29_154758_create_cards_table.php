@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::dropIfExists('cards');
         Schema::create('cards', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('collection_id')->constrained();
             $table->text('name');
             $table->text('description');
             $table->timestamps();
