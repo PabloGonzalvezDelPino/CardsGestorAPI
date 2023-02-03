@@ -25,7 +25,7 @@ Route::prefix('/cards')->group(function(){
     Route::put('/add', [CardsController::class, 'add']);
 });
 Route::prefix('/collections')->group(function(){
-    Route::put('/add', [CollectionsController::class, 'add']);
+    Route::middleware(['auth:sanctum','administrador'])->put('/add', [CollectionsController::class, 'add']);
 });
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
