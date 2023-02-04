@@ -42,7 +42,6 @@ class CollectionsController extends Controller
                     $card = new Card();
                     $card->name = $data->card_name;
                     $card->description = $data->card_description;
-                    //$actualUserId = Auth::id();
                     try{
                         $card->save();
                         $collection->save(); 

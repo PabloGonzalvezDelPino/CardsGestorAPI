@@ -67,7 +67,6 @@ class UsersController extends Controller
            }
        }
    }
-   //User aa token: hgPUxmfA09Qr3BdGnmRgIhX9qWHkKO6NwTkQx9gX
    public function recoverPass(Request $request){
     $json = $request->getContent();
     $data = json_decode($json);
