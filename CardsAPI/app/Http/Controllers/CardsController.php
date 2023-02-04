@@ -11,6 +11,7 @@ use App\Http\Helpers\ResponseGenerator;
 use App\Models\Card;
 use App\Models\Collection;
 use App\Models\User;
+use App\Models\Sale;
 
 class CardsController extends Controller
 {
@@ -112,12 +113,12 @@ class CardsController extends Controller
             if($validate->fails()){
                 return ResponseGenerator::generateResponse("KO", 422, null, $validate->errors());
             }else {
-                $actualUserId = Auth::id();
+                
+                $user_id = Auth::id(); 
                 try{
                     $card = Card::find($data->cardId);
-                    $card->users()->attach($actualUserId, ['amount'=>$data->amount, 'price'=>$data->price]);
-                    //$card->save();
-                    return ResponseGenerator::generateResponse("OK", 200, $card, "Carta añadida correctamente");
+                    $card->users()->attach($user_id, ['amount'=>$data->amount, 'price'=>$data->price]);
+                    return ResponseGenerator::generateResponse("OK", 200, $id, "Carta añadida correctamente");
                 }catch(\Exception $e){
                     return ResponseGenerator::generateResponse("KO", 304, null, "Error al añadir");
                 }
@@ -126,5 +127,31 @@ class CardsController extends Controller
             return ResponseGenerator::generateResponse("KO", 500, null, "Datos no registrados");
         }
 
+    }
+    public function searchToBuy(Request $request){
+        $json = $request->getContent();
+        $data = json_decode($json);
+
+        if($data){
+            $validate = Validator::make(json_decode($json,true), [
+                'cardName' => 'required|string'
+            ]);
+            if($validate->fails()){
+                return ResponseGenerator::generateResponse("KO", 422, null, $validate->errors());
+            }else {
+                try{
+                $cards = Card::where('name', 'like', '%'.$data->cardName.'%')->with()->get();
+                if(isset($cards)){
+                    return ResponseGenerator::generateResponse("OK", 200, $cards, "Carta buscada correctamente");
+                }else{
+                    return ResponseGenerator::generateResponse("OK", 200, null, "Carta no encontrada");
+                }
+                }catch(\Exception $e){
+                    return ResponseGenerator::generateResponse("KO", 304, null, "Erro al buscar");
+                }
+            }      
+        }else{
+            return ResponseGenerator::generateResponse("KO", 500, null, "Datos no registrados");
+        }
     }
 }

@@ -24,8 +24,8 @@ Route::prefix('/users')->group(function(){
 Route::prefix('/cards')->group(function(){
     Route::middleware(['auth:sanctum','ability:Administrador'])->put('/create', [CardsController::class, 'create']);
     Route::middleware(['auth:sanctum','ability:Administrador'])->put('/addToCollection', [CardsController::class, 'addToCollection']);
-    Route::get('/searchByName', [CardsController::class, 'searchByName']);
-    Route::post('/publishCard', [CardsController::class, 'publishCard']);
+    Route::middleware(['auth:sanctum','ability:Administrador,Particular,Profesional'])->get('/searchByName', [CardsController::class, 'searchByName']);
+    Route::middleware(['auth:sanctum','ability:Administrador,Particular,Profesional'])->post('/publishCard', [CardsController::class, 'publishCard']);
     
 });
 Route::prefix('/collections')->group(function(){
