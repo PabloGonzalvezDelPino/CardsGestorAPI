@@ -114,10 +114,10 @@ class CardsController extends Controller
                 return ResponseGenerator::generateResponse("KO", 422, null, $validate->errors());
             }else {
                 
-                $user_id = Auth::id(); 
+                $id = Auth::id(); 
                 try{
                     $card = Card::find($data->cardId);
-                    $card->users()->attach($user_id, ['amount'=>$data->amount, 'price'=>$data->price]);
+                    $card->users()->attach($id, ['amount'=>$data->amount, 'price'=>$data->price]);
                     return ResponseGenerator::generateResponse("OK", 200, $id, "Carta añadida correctamente");
                 }catch(\Exception $e){
                     return ResponseGenerator::generateResponse("KO", 304, null, "Error al añadir");
@@ -140,14 +140,26 @@ class CardsController extends Controller
                 return ResponseGenerator::generateResponse("KO", 422, null, $validate->errors());
             }else {
                 try{
-                $cards = Card::where('name', 'like', '%'.$data->cardName.'%')->with()->get();
-                if(isset($cards)){
-                    return ResponseGenerator::generateResponse("OK", 200, $cards, "Carta buscada correctamente");
-                }else{
-                    return ResponseGenerator::generateResponse("OK", 200, null, "Carta no encontrada");
-                }
+                    
+                    //$cards = Card::where('name', 'like', '%'.$data->cardName.'%')->has('users')->with(['users:id'])->sortBy('card_user.price')->get();
+                        //->orderByPivot('price', 'ASC')
+                        //$user->pivot->price
+
+                    $cards = Card::where('name', 'like', '%'.$data->cardName.'%')
+                        ->has('users')
+                        ->join('card_user', 'cards.id', '=', 'card_user.card_id')
+                        ->join('users', 'card_user.user_id', '=', 'users.id')
+                        ->orderBy('card_user.price','asc')
+                        ->select('cards.*','card_user.user_id', 'card_user.price','card_user.amount')
+                        ->get();
+
+                    if(isset($cards)){
+                        return ResponseGenerator::generateResponse("OK", 200, $cards, "Carta buscada correctamente");
+                    }else{
+                        return ResponseGenerator::generateResponse("OK", 200, null, "Carta no encontrada");
+                    }
                 }catch(\Exception $e){
-                    return ResponseGenerator::generateResponse("KO", 304, null, "Erro al buscar");
+                    return ResponseGenerator::generateResponse("KO", 304, $e, "Error al buscar");
                 }
             }      
         }else{

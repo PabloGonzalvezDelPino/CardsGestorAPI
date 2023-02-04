@@ -15,7 +15,7 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     public function cards(){
-        return $this->belongsToMany(Card::class);
+        return $this->belongsToMany(Card::class)->withPivot('amount', 'price');
     }
     public function collections(){
         return $this->belongsToMany(Collection::class);
