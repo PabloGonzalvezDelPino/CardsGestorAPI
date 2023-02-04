@@ -140,11 +140,6 @@ class CardsController extends Controller
                 return ResponseGenerator::generateResponse("KO", 422, null, $validate->errors());
             }else {
                 try{
-                    
-                    //$cards = Card::where('name', 'like', '%'.$data->cardName.'%')->has('users')->with(['users:id'])->sortBy('card_user.price')->get();
-                        //->orderByPivot('price', 'ASC')
-                        //$user->pivot->price
-
                     $cards = Card::where('name', 'like', '%'.$data->cardName.'%')
                         ->has('users')
                         ->join('card_user', 'cards.id', '=', 'card_user.card_id')
