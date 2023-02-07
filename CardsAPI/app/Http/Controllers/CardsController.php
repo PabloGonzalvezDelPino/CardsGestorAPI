@@ -99,6 +99,7 @@ class CardsController extends Controller
                 }
             }      
         }else{
+            Log::error('No hay filtro');
             return ResponseGenerator::generateResponse("KO", 500, null, "Datos no registrados");
         }
     }
