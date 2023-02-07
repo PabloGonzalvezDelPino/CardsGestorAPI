@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use App\Http\Helpers\ResponseGenerator;
 use App\Models\Card;
 use App\Models\Collection;
@@ -79,20 +80,21 @@ class CardsController extends Controller
         $data = json_decode($json);
 
         if($data){
+            Log::info('Obtención de datos', ['data' => $data]);
             $validate = Validator::make(json_decode($json,true), [
                 'cardName' => 'required|string'
             ]);
             if($validate->fails()){
+                Log::error('Error al validarlos datos', ['errors' => $validate->fails()]);
                 return ResponseGenerator::generateResponse("KO", 422, null, $validate->errors());
             }else {
+                Log::info('Correcta validación de datos', ['data' => $data->name]);
                 try{
-                $cards = Card::where('name', 'like', '%'.$data->cardName.'%')->get();
-                if(isset($cards)){
+                    $cards = Card::where('name', 'like', '%'.$data->cardName.'%')->get();
+                    Log::info('Busqueda de cartas', ['cartas' => $cards]);
                     return ResponseGenerator::generateResponse("OK", 200, $cards, "Carta buscada correctamente");
-                }else{
-                    return ResponseGenerator::generateResponse("OK", 200, null, "Carta no encontrada");
-                }
                 }catch(\Exception $e){
+                    Log::error('Error en la búsqueda', ['error' => $e]);
                     return ResponseGenerator::generateResponse("KO", 304, null, "Erro al buscar");
                 }
             }      

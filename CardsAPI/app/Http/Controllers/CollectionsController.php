@@ -30,9 +30,10 @@ class CollectionsController extends Controller
                 $collection->name = $data->name;
                 $collection->image = $data->image;
                 if(isset($data->card_id)){
+                    try{
                     $card = Card::find($data->card_id);
                     $collection->cards()->attach($data->card_id);
-                    try{
+                    
                         $collection->save();
                         return ResponseGenerator::generateResponse("OK", 200, $card, "Collección guardada correctamente");
                     }catch(\Exception $e){
