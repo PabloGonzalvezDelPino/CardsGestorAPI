@@ -164,4 +164,32 @@ class CardsController extends Controller
             return ResponseGenerator::generateResponse("KO", 500, null, "Datos no registrados");
         }
     }
+    public function edit(Request $request){
+        $json = $request->getContent();
+        $data = json_decode($json);
+
+        if($data){
+            $validate = Validator::make(json_decode($json,true), [
+                'cardId' => 'required|exists:cards,id',
+                'name' => 'required|string',
+                'description' => 'required|string'
+            ]);
+            if($validate->fails()){
+                return ResponseGenerator::generateResponse("KO", 422, null, $validate->errors());
+            }else {
+
+                $card = Card::find($data->cardId);
+                $card->name = $data->name;
+                $card->description = $data->description;
+                try{
+                    $card->save();
+                    return ResponseGenerator::generateResponse("OK", 200, $card, "Carta actualizada correctamente");
+                }catch(\Exception $e){
+                    return ResponseGenerator::generateResponse("KO", 304, null, "Error al actualizar");
+                }
+            }      
+        }else{
+            return ResponseGenerator::generateResponse("KO", 500, null, "Datos no registrados");
+        }
+    }
 }

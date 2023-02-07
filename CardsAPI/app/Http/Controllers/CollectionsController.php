@@ -60,4 +60,31 @@ class CollectionsController extends Controller
             return ResponseGenerator::generateResponse("KO", 500, null, "Datos no registrados");
         }
     }
+    public function edit(Request $request){
+        $json = $request->getContent();
+        $data = json_decode($json);
+
+        if($data){
+            $validate = Validator::make(json_decode($json,true), [
+                'collectionId' => 'required|exists:collections,id',
+                'name' => 'required|string',
+                'image' => 'required|string',
+            ]);
+            if($validate->fails()){
+                return ResponseGenerator::generateResponse("KO", 422, null, $validate->errors());
+            }else {
+                $collection = Collection::find($data->collectionId);
+                $collection->name = $data->name;
+                $collection->image = $data->image;
+                try{
+                    $collection->save();
+                    return ResponseGenerator::generateResponse("OK", 200, $card, "Collección guardada correctamente");
+                }catch(\Exception $e){
+                    return ResponseGenerator::generateResponse("KO", 304, null, "Error al guardar");
+                }
+            }      
+        }else{
+            return ResponseGenerator::generateResponse("KO", 500, null, "Datos no registrados");
+        }
+    }
 }
