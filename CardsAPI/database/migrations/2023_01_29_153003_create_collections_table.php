@@ -18,7 +18,7 @@ return new class extends Migration
             $table->id();
             $table->text('name');
             $table->text('image');
-            $table->date('publish_date')->default(null)->nullable();
+            $table->date('realeaseDate');
             $table->timestamps();
         });
     }

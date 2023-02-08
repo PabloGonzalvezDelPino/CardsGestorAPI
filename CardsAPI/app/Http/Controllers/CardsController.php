@@ -85,12 +85,12 @@ class CardsController extends Controller
                 'cardName' => 'required|string'
             ]);
             if($validate->fails()){
-                Log::error('Error al validarlos datos', ['errors' => $validate->fails()]);
+                Log::error('Error al validarlos datos', ['errors' => $validate->errors()]);
                 return ResponseGenerator::generateResponse("KO", 422, null, $validate->errors());
             }else {
                 Log::info('Correcta validación de datos', ['data' => $data->cardName]);
                 try{
-                    $cards = Card::where('name', 'like', '%'.$data->cardName.'%')->get();
+                    $cards = Card::where('name', 'like', '%'.$data->cardName.'%')->select('cards.id','cards.name','cards.description')->get();
                     Log::info('Busqueda de cartas', ['cartas' => $cards]);
                     return ResponseGenerator::generateResponse("OK", 200, $cards, "Carta buscada correctamente");
                 }catch(\Exception $e){
@@ -116,18 +116,15 @@ class CardsController extends Controller
             if($validate->fails()){
                 return ResponseGenerator::generateResponse("KO", 422, null, $validate->errors());
             }else {
-                //if(Auth::user()->can('Administrador')){
-                    $id = Auth::id(); 
-                    try{
-                        $card = Card::find($data->cardId);
-                        $card->users()->attach($id, ['amount'=>$data->amount, 'price'=>$data->price]);
-                        return ResponseGenerator::generateResponse("OK", 200, $id, "Carta añadida correctamente");
-                    }catch(\Exception $e){
-                        return ResponseGenerator::generateResponse("KO", 304, null, "Error al añadir");
-                    }
-                /*}else{
-                    return ResponseGenerator::generateResponse("KO", 404, null, "Usuario sin permisos");
-                }*/
+                $id = Auth::id(); 
+                try{
+                    $card = Card::find($data->cardId);
+                    $card->users()->attach($id, ['amount'=>$data->amount, 'price'=>$data->price]);
+                    return ResponseGenerator::generateResponse("OK", 200, $id, "Carta añadida correctamente");
+                }catch(\Exception $e){
+                    return ResponseGenerator::generateResponse("KO", 304, null, "Error al añadir");
+                }
+                
             }      
         }else{
             return ResponseGenerator::generateResponse("KO", 500, null, "Datos no registrados");

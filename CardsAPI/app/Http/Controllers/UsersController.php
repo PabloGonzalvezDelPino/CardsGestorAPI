@@ -30,7 +30,7 @@ class UsersController extends Controller
                 $user->type = $data->type;
                 try{
                     $user->save();
-                    return ResponseGenerator::generateResponse("OK", 200, $user, "Usuario guardado correctamente");
+                    return ResponseGenerator::generateResponse("OK", 200, $user, "Usuario registrado correctamente");
                 }catch(\Exception $e){
                     return ResponseGenerator::generateResponse("KO", 304, null, "Error al guardar");
                 }
@@ -45,8 +45,8 @@ class UsersController extends Controller
 
         if($data){
            $validate = Validator::make(json_decode($json,true), [
-               'username' => 'required',
-               'password' => 'required'
+               'username' => 'required|string',
+               'password' => 'required|string'
            ]);
            if($validate->fails()){
                return ResponseGenerator::generateResponse("OK", 422, null, $validate->errors());
@@ -68,28 +68,26 @@ class UsersController extends Controller
        }
    }
    public function recoverPass(Request $request){
-    $json = $request->getContent();
-    $data = json_decode($json);
+        $json = $request->getContent();
+        $data = json_decode($json);
 
-    if($data){
-        $validate = Validator::make(json_decode($json,true), [
-            'email' => 'required'
-        ]);
-        if($validate->fails()){
-            return ResponseGenerator::generateResponse("OK", 422, null, $validate->errors());
-        }else{
-            try{
-                $user = User::where('email', 'like', $data->email)->firstOrFail();
-                $newPass = random_int(100000, 999999);
-                $user->password = Hash::make($newPass);
-                $user->save();
-                return ResponseGenerator::generateResponse("OK", 200, null , "Tu nueva pass es: ".$newPass);
-                
-            }catch(\Exception $e){
-                return ResponseGenerator::generateResponse("KO", 404, null, "Correo incorrecto");
+        if($data){
+            $validate = Validator::make(json_decode($json,true), [
+                'email' => 'required|string'
+            ]);
+            if($validate->fails()){
+                return ResponseGenerator::generateResponse("OK", 422, null, $validate->errors());
+            }else{
+                try{
+                    $user = User::where('email', 'like', $data->email)->firstOrFail();
+                    $newPass = random_int(100000, 999999);
+                    $user->password = Hash::make($newPass);
+                    $user->save();
+                    return ResponseGenerator::generateResponse("OK", 200, null , "Tu nueva pass es: ".$newPass);  
+                }catch(\Exception $e){
+                    return ResponseGenerator::generateResponse("KO", 404, null, "Correo incorrecto");
+                }
             }
-        
         }
-    }
    }
 }

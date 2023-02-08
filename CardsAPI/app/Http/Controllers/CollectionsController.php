@@ -21,6 +21,7 @@ class CollectionsController extends Controller
             $validate = Validator::make(json_decode($json,true), [
                 'name' => 'required|string',
                 'image' => 'required|string',
+                'cards' => 'required|array|min:1'
             ]);
             if($validate->fails()){
                 return ResponseGenerator::generateResponse("KO", 422, null, $validate->errors());
@@ -28,11 +29,12 @@ class CollectionsController extends Controller
                 $collection = new Collection();
                 $collection->name = $data->name;
                 $collection->image = $data->image;
+                $collection->realeaseDate = date('Y-m-d h:i:s');
                 try{
                     foreach($data->cards as $element){
                         if(isset($element->cardId)){
                             try{
-                            $card = Card::find($element->cardId);
+                                $card = Card::find($element->cardId);
                             }catch(\Exception $e){
                                 return ResponseGenerator::generateResponse("KO", 304, $e, "Error al Buscar la carta");
                             }
