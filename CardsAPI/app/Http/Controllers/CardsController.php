@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 use App\Http\Helpers\ResponseGenerator;
 use App\Models\Card;
 use App\Models\Collection;
@@ -191,5 +192,41 @@ class CardsController extends Controller
         }else{
             return ResponseGenerator::generateResponse("KO", 500, null, "Datos no registrados");
         }
+    }
+    public function addFromMagic(){
+        $response = Http::get('https://api.magicthegathering.io/v1/cards');
+        if($response->object()){
+            try{
+                foreach($response->object()->sets as $set){
+                    $existCollection = Collection::where('code',$set->code)->first();
+                    if($existCollection){
+                        $existCollection->name = $set->name;
+                        $existCollection->code = $set->code;
+                        $existCollection->image = "https://e00-marca.uecdn.es/assets/multimedia/imagenes/2021/07/30/16276380102497.jpg";
+                        $existCollection->releaseDate = $set->releaseDate;
+                        try{
+                            $existCollection->save();
+                        }catch(\Exception $e){
+                            return ResponseGenerator::generateResponse("KO", 304, null, "Error al guardar existente");
+                        }
+                    }else{
+                        $collection = new Collection();
+                        $collection->name = $set->name;
+                        $collection->code = $set->code;
+                        $collection->image = "https://e00-marca.uecdn.es/assets/multimedia/imagenes/2021/07/30/16276380102497.jpg";
+                        $collection->releaseDate = $set->releaseDate;
+                        try{
+                            $collection->save();
+                        }catch(\Exception $e){
+                            return ResponseGenerator::generateResponse("KO", 304, null, "Error al guardar nueva");
+                        }
+                    } 
+                }
+                return ResponseGenerator::generateResponse("OK", 200, null, "Coleciones guardadas correctamente");
+            }catch(\Exception $e){
+                return ResponseGenerator::generateResponse("KO", 304, $response, "Error con lel bucle for");
+            }
+        }
+
     }
 }

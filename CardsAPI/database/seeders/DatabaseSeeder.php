@@ -18,10 +18,10 @@ class DatabaseSeeder extends Seeder
     {
         DB::table('users')->insert([
             ['username' => 'Pablo','email' => 'pablo@gmail.com','password' => Hash::make('1234'),'type' => 'Administrador'],
-            ['username' => 'Andres','email' => 'andres@gmail.com','password' => Hash::make('1234'),'type' => 'Particular'],
-            ['username' => 'Isa','email' => 'isa@gmail.com','password' => Hash::make('1234'),'type' => 'Profesional']
+            //['username' => 'Andres','email' => 'andres@gmail.com','password' => Hash::make('1234'),'type' => 'Particular'],
+            //['username' => 'Isa','email' => 'isa@gmail.com','password' => Hash::make('1234'),'type' => 'Profesional']
         ]);
-        DB::table('cards')->insert([
+       /* DB::table('cards')->insert([
             ['name' => 'Charmander','description' => 'Pokemon inicial de tipo Fugo'],
             ['name' => 'Charmeleon','description' => 'Primera evolución de Charmadner'],
             ['name' => 'Charizard','description' => 'Segunda evolución de Charmadner'],
@@ -46,6 +46,7 @@ class DatabaseSeeder extends Seeder
             ['card_id' => 5,'user_id' => 3,'amount' => 1,'price' => 50],
             ['card_id' => 2,'user_id' => 3,'amount' => 1,'price' => 100]
         ]);
+        */
         
     }
 }

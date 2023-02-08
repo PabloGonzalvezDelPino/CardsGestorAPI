@@ -32,6 +32,7 @@ Route::prefix('/cards')->group(function(){
 Route::prefix('/collections')->group(function(){
     Route::middleware(['auth:sanctum','ability:Administrador'])->put('/create', [CollectionsController::class, 'create']);
     Route::middleware(['auth:sanctum','ability:Administrador'])->post('/edit', [CollectionsController::class, 'edit']);
+    Route::middleware(['auth:sanctum','ability:Administrador'])->put('/addFromMagic', [CollectionsController::class, 'addFromMagic']);
 });
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

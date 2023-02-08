@@ -18,6 +18,7 @@ return new class extends Migration
             $table->id();
             $table->text('name');
             $table->text('description');
+            $table->text('number')->unique()->default(null)->nullable();
             $table->timestamps();
         });
     }
