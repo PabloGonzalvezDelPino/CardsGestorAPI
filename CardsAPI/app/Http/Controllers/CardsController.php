@@ -197,32 +197,33 @@ class CardsController extends Controller
         $response = Http::get('https://api.magicthegathering.io/v1/cards');
         if($response->object()){
             try{
-                foreach($response->object()->sets as $set){
-                    $existCollection = Collection::where('code',$set->code)->first();
-                    if($existCollection){
-                        $existCollection->name = $set->name;
-                        $existCollection->code = $set->code;
-                        $existCollection->image = "https://e00-marca.uecdn.es/assets/multimedia/imagenes/2021/07/30/16276380102497.jpg";
-                        $existCollection->releaseDate = $set->releaseDate;
+                foreach($response->object()->cards as $card){
+                    $existCard = Card::where('number', 'LIKE' ,$card->number)->first();
+                    $collection = Collection::where('code','LIKE',$card->set)->get();
+                    if($existCard){
+                        $existCard->name = $card->name;
+                        $existCard->number = $card->number;
+                        $existCard->description = $card->text;
                         try{
-                            $existCollection->save();
+                            $existCard->save();
+                            $existCard->collections()->attach($collection[0]->id);
                         }catch(\Exception $e){
-                            return ResponseGenerator::generateResponse("KO", 304, null, "Error al guardar existente");
+                            return ResponseGenerator::generateResponse("KO", 304, $e, "Error al guardar existente");
                         }
                     }else{
-                        $collection = new Collection();
-                        $collection->name = $set->name;
-                        $collection->code = $set->code;
-                        $collection->image = "https://e00-marca.uecdn.es/assets/multimedia/imagenes/2021/07/30/16276380102497.jpg";
-                        $collection->releaseDate = $set->releaseDate;
+                        $newCard = new Card();
+                        $newCard->name = $card->name;
+                        $newCard->number = $card->number;
+                        $newCard->description = $card->text;
                         try{
-                            $collection->save();
+                            $newCard->save();
+                            $newCard->collections()->attach($collection->id);
                         }catch(\Exception $e){
-                            return ResponseGenerator::generateResponse("KO", 304, null, "Error al guardar nueva");
+                            return ResponseGenerator::generateResponse("KO", 304, $collection, "Error al guardar nueva");
                         }
                     } 
                 }
-                return ResponseGenerator::generateResponse("OK", 200, null, "Coleciones guardadas correctamente");
+                return ResponseGenerator::generateResponse("OK", 200, null, "Cartas guardadas correctamente");
             }catch(\Exception $e){
                 return ResponseGenerator::generateResponse("KO", 304, $response, "Error con lel bucle for");
             }
