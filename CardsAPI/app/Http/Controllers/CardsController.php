@@ -88,7 +88,7 @@ class CardsController extends Controller
                 Log::error('Error al validarlos datos', ['errors' => $validate->fails()]);
                 return ResponseGenerator::generateResponse("KO", 422, null, $validate->errors());
             }else {
-                Log::info('Correcta validación de datos', ['data' => $data->name]);
+                Log::info('Correcta validación de datos', ['data' => $data->cardName]);
                 try{
                     $cards = Card::where('name', 'like', '%'.$data->cardName.'%')->get();
                     Log::info('Busqueda de cartas', ['cartas' => $cards]);
@@ -116,15 +116,18 @@ class CardsController extends Controller
             if($validate->fails()){
                 return ResponseGenerator::generateResponse("KO", 422, null, $validate->errors());
             }else {
-                
-                $id = Auth::id(); 
-                try{
-                    $card = Card::find($data->cardId);
-                    $card->users()->attach($id, ['amount'=>$data->amount, 'price'=>$data->price]);
-                    return ResponseGenerator::generateResponse("OK", 200, $id, "Carta añadida correctamente");
-                }catch(\Exception $e){
-                    return ResponseGenerator::generateResponse("KO", 304, null, "Error al añadir");
-                }
+                //if(Auth::user()->can('Administrador')){
+                    $id = Auth::id(); 
+                    try{
+                        $card = Card::find($data->cardId);
+                        $card->users()->attach($id, ['amount'=>$data->amount, 'price'=>$data->price]);
+                        return ResponseGenerator::generateResponse("OK", 200, $id, "Carta añadida correctamente");
+                    }catch(\Exception $e){
+                        return ResponseGenerator::generateResponse("KO", 304, null, "Error al añadir");
+                    }
+                /*}else{
+                    return ResponseGenerator::generateResponse("KO", 404, null, "Usuario sin permisos");
+                }*/
             }      
         }else{
             return ResponseGenerator::generateResponse("KO", 500, null, "Datos no registrados");
