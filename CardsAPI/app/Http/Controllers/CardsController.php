@@ -79,7 +79,6 @@ class CardsController extends Controller
     public function searchByName(Request $request){
         $json = $request->getContent();
         $data = json_decode($json);
-
         if($data){
             Log::info('Obtención de datos', ['data' => $data]);
             $validate = Validator::make(json_decode($json,true), [
@@ -200,13 +199,15 @@ class CardsController extends Controller
                 foreach($response->object()->cards as $card){
                     $existCard = Card::where('number', 'LIKE' ,$card->number)->first();
                     $collection = Collection::where('code','LIKE',$card->set)->get();
+                       
                     if($existCard){
                         $existCard->name = $card->name;
                         $existCard->number = $card->number;
                         $existCard->description = $card->text;
                         try{
                             $existCard->save();
-                            $existCard->collections()->attach($collection[0]->id);
+                            $collection->cards()->attach($existCard->id);
+
                         }catch(\Exception $e){
                             return ResponseGenerator::generateResponse("KO", 304, $e, "Error al guardar existente");
                         }
@@ -217,9 +218,9 @@ class CardsController extends Controller
                         $newCard->description = $card->text;
                         try{
                             $newCard->save();
-                            $newCard->collections()->attach($collection->id);
+                            $collection->cards()->attach($newCard->id);
                         }catch(\Exception $e){
-                            return ResponseGenerator::generateResponse("KO", 304, $collection, "Error al guardar nueva");
+                            return ResponseGenerator::generateResponse("KO", 304, [$collection, $newCard], "Error al guardar nueva");
                         }
                     } 
                 }

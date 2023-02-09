@@ -21,17 +21,18 @@ class DatabaseSeeder extends Seeder
             //['username' => 'Andres','email' => 'andres@gmail.com','password' => Hash::make('1234'),'type' => 'Particular'],
             //['username' => 'Isa','email' => 'isa@gmail.com','password' => Hash::make('1234'),'type' => 'Profesional']
         ]);
-       /* DB::table('cards')->insert([
-            ['name' => 'Charmander','description' => 'Pokemon inicial de tipo Fugo'],
-            ['name' => 'Charmeleon','description' => 'Primera evolución de Charmadner'],
-            ['name' => 'Charizard','description' => 'Segunda evolución de Charmadner'],
-            ['name' => 'Squirtle','description' => 'Pokemon inicial de tipo agua'],
-            ['name' => 'Wartortle','description' => 'Priemra evolución de Squirtle'],
-            ['name' => 'Blastoise','description' => 'Segunda evolución de Squirtle']
+      /* DB::table('cards')->insert([
+            ['name' => 'Charmander','description' => 'Pokemon inicial de tipo Fugo','number'=>'asd'],
+            ['name' => 'Charmeleon','description' => 'Primera evolución de Charmadner','number'=>'dsa'],
+            ['name' => 'Charizard','description' => 'Segunda evolución de Charmadner','number'=>'sad'],
+            ['name' => 'Squirtle','description' => 'Pokemon inicial de tipo agua','number'=>'das'],
+            ['name' => 'Wartortle','description' => 'Priemra evolución de Squirtle','number'=>'qwe'],
+            ['name' => 'Blastoise','description' => 'Segunda evolución de Squirtle','number'=>'aewqsv']
         ]);
         DB::table('collections')->insert([
-            ['name' => 'Fuego','image' => 'url de la imagen','realeaseDate' => date('Y-m-d h:i:s')],
-            ['name' => 'Agua','image' => 'url de la imagen','realeaseDate' => date('Y-m-d h:i:s')]
+            ['name' => 'Fuego','image' => 'url de la imagen','realeaseDate' => date('Y-m-d h:i:s'),'code' =>'qw'],
+            ['name' => 'Agua','image' => 'url de la imagen','realeaseDate' => date('Y-m-d h:i:s'),'code' =>'sad'
+            ]
         ]);
         DB::table('card_collection')->insert([
             ['card_id' => 1,'collection_id' => 1],
@@ -45,8 +46,6 @@ class DatabaseSeeder extends Seeder
             ['card_id' => 1,'user_id' => 2,'amount' => 2,'price' => 10],
             ['card_id' => 5,'user_id' => 3,'amount' => 1,'price' => 50],
             ['card_id' => 2,'user_id' => 3,'amount' => 1,'price' => 100]
-        ]);
-        */
-        
+        ]);     */
     }
 }
