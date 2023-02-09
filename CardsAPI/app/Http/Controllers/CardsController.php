@@ -206,7 +206,7 @@ class CardsController extends Controller
                         $existCard->description = $card->text;
                         try{
                             $existCard->save();
-                            $collection->cards()->attach($existCard->id);
+                            //$collection->cards()->attach($existCard->id);
 
                         }catch(\Exception $e){
                             return ResponseGenerator::generateResponse("KO", 304, $e, "Error al guardar existente");
@@ -218,9 +218,9 @@ class CardsController extends Controller
                         $newCard->description = $card->text;
                         try{
                             $newCard->save();
-                            $collection->cards()->attach($newCard->id);
+                            //$collection->cards()->attach($newCard->id);
                         }catch(\Exception $e){
-                            return ResponseGenerator::generateResponse("KO", 304, [$collection, $newCard], "Error al guardar nueva");
+                            return ResponseGenerator::generateResponse("KO", 304, $e, "Error al guardar nueva");
                         }
                     } 
                 }
