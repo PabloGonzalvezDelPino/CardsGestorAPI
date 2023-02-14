@@ -13,7 +13,7 @@ use App\Http\Helpers\ResponseGenerator;
 use App\Models\Card;
 use App\Models\Collection;
 use App\Models\User;
-use App\Models\Sale;
+use App\Models\Card_Collection;
 
 class CardsController extends Controller
 {
@@ -198,7 +198,8 @@ class CardsController extends Controller
             try{
                 foreach($response->object()->cards as $card){
                     $existCard = Card::where('number', 'LIKE' ,$card->number)->first();
-                    $collection = Collection::where('code','LIKE',$card->set)->get();
+                    $collection = Collection::where('code','LIKE',$card->set)->first();
+                    //$cardCollection = new Card_Collection();
                        
                     if($existCard){
                         $existCard->name = $card->name;
@@ -206,7 +207,10 @@ class CardsController extends Controller
                         $existCard->description = $card->text;
                         try{
                             $existCard->save();
-                            //$collection->cards()->attach($existCard->id);
+                            /*$cardCollection->card_id = $existCard->id;
+                            $cardCollection->collection_id = $collection->id;
+                            $cardCollection->save();*/
+                            $collection->cards()->attach($existCard->id);
 
                         }catch(\Exception $e){
                             return ResponseGenerator::generateResponse("KO", 304, $e, "Error al guardar existente");
@@ -218,7 +222,10 @@ class CardsController extends Controller
                         $newCard->description = $card->text;
                         try{
                             $newCard->save();
-                            //$collection->cards()->attach($newCard->id);
+                            /*$cardCollection->card_id = $newCard->id;
+                            $cardCollection->collection_id = $collection->id;
+                            $cardCollection->save();*/
+                            $collection->cards()->attach($newCard->id);
                         }catch(\Exception $e){
                             return ResponseGenerator::generateResponse("KO", 304, $e, "Error al guardar nueva");
                         }
