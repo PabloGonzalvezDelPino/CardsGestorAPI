@@ -193,49 +193,105 @@ class CardsController extends Controller
         }
     }
     public function addFromMagic(){
-        $response = Http::get('https://api.magicthegathering.io/v1/cards');
-        if($response->object()){
-            try{
-                foreach($response->object()->cards as $card){
-                    $existCard = Card::where('number', 'LIKE' ,$card->number)->first();
-                    $collection = Collection::where('code','LIKE',$card->set)->first();
-                    //$cardCollection = new Card_Collection();
-                       
-                    if($existCard){
-                        $existCard->name = $card->name;
-                        $existCard->number = $card->number;
-                        $existCard->description = $card->text;
-                        try{
-                            $existCard->save();
-                            /*$cardCollection->card_id = $existCard->id;
-                            $cardCollection->collection_id = $collection->id;
-                            $cardCollection->save();*/
-                            $collection->cards()->attach($existCard->id);
-
-                        }catch(\Exception $e){
-                            return ResponseGenerator::generateResponse("KO", 304, $e, "Error al guardar existente");
-                        }
-                    }else{
-                        $newCard = new Card();
-                        $newCard->name = $card->name;
-                        $newCard->number = $card->number;
-                        $newCard->description = $card->text;
-                        try{
-                            $newCard->save();
-                            /*$cardCollection->card_id = $newCard->id;
-                            $cardCollection->collection_id = $collection->id;
-                            $cardCollection->save();*/
-                            $collection->cards()->attach($newCard->id);
-                        }catch(\Exception $e){
-                            return ResponseGenerator::generateResponse("KO", 304, $e, "Error al guardar nueva");
-                        }
-                    } 
+        $countColec = 0;
+        $exitColec = false;
+        while($exitColec == false){
+            $response = Http::get('https://api.magicthegathering.io/v1/sets?page='.$countColec);
+            if(!empty($response->object()->sets)){
+                try{
+                    foreach($response->object()->sets as $set){
+                        $existCollection = Collection::where('code',$set->code)->first();
+                        if($existCollection){
+                            $existCollection->name = $set->name;
+                            $existCollection->code = $set->code;
+                            $existCollection->image = "https://e00-marca.uecdn.es/assets/multimedia/imagenes/2021/07/30/16276380102497.jpg";
+                            $existCollection->releaseDate = $set->releaseDate;
+                            try{
+                                $existCollection->save();                               
+                                set_time_limit(30);
+                            }catch(\Exception $e){
+                                return ResponseGenerator::generateResponse("KO", 304, null, "Error al guardar existente");
+                            }
+                        }else{
+                            $collection = new Collection();
+                            $collection->name = $set->name;
+                            $collection->code = $set->code;
+                            $collection->image = "https://e00-marca.uecdn.es/assets/multimedia/imagenes/2021/07/30/16276380102497.jpg";
+                            $collection->releaseDate = $set->releaseDate;
+                            try{
+                                $collection->save();
+                                set_time_limit(30);
+                            }catch(\Exception $e){
+                                return ResponseGenerator::generateResponse("KO", 304, null, "Error al guardar nueva");
+                            }
+                        } 
+                    }
+                }catch(\Exception $e){
+                    return ResponseGenerator::generateResponse("KO", 304, $response, "Error con lel bucle for");
                 }
-                return ResponseGenerator::generateResponse("OK", 200, null, "Cartas guardadas correctamente");
-            }catch(\Exception $e){
-                return ResponseGenerator::generateResponse("KO", 304, $response, "Error con lel bucle for");
-            }
+            }else{
+                $exitColec= true;
+            } 
+            $countColec+=1;    
         }
-
+        $countCard = 0;
+        $exitCard = true;
+        while($exitCard){
+            $response = Http::get('https://api.magicthegathering.io/v1/cards?page='.$countCard);
+           
+            if(!empty($response->object()->cards)){
+                    foreach($response->object()->cards as $card){
+                        set_time_limit(2000);
+                        $existCard = Card::where('number', 'LIKE' ,$card->number)->first();
+                        $collection = Collection::where('code','LIKE',$card->set)->first();
+                          
+                        if($existCard){
+                            if(isset($existCard->set)  && $existCard->set != null){
+                                $existCard->name = $card->name;
+                                $existCard->number = $card->number;
+                                if(isset($card->text)){
+                                    $existCard->description = $card->text;
+                                }else{
+                                    $existCard->description = "";
+                                }
+                                if(isset($collection)){
+                                    try{
+                                        $existCard->save();
+                                        $collection->cards()->attach($existCard->id);    
+                                        set_time_limit(2000);
+                                    }catch(\Exception $e){
+                                        return ResponseGenerator::generateResponse("KO", 304, [$e,$existCard->set], "Error al guardar existente");
+                                    }
+                                }  
+                            }
+                        }else if(isset($card->set)  && $card->set != null){
+                            $newCard = new Card();
+                            $newCard->name = $card->name;
+                            $newCard->number = $card->number;
+                            if(isset($card->text)){
+                                $newCard->description = $card->text;
+                            }else{
+                                $newCard->description = "";
+                            }
+                            
+                            if(isset($collection)){
+                                try{
+                                    $newCard->save();
+                                    $collection->cards()->attach($newCard->id);
+                                    set_time_limit(2000);
+                                }catch(\Exception $e){
+                                    return ResponseGenerator::generateResponse("KO", 304, [$e,$card->set], "Error al guardar nueva");
+                                }
+                            }    
+                        } else{
+                            return ResponseGenerator::generateResponse("KO", 304, $e, "Se fue a la puta");
+                        }
+                    }
+            }else{
+                $exitCard= false;
+            }
+            $countCard+=1;    
+        }
+        return ResponseGenerator::generateResponse("OK", 200, null, "Cartas guardadas correctamente");
     }
 }
