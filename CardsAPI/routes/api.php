@@ -17,7 +17,7 @@ use App\Http\Controllers\CollectionsController;
 |
 */
 Route::prefix('/users')->group(function(){
-    Route::post('/login', [UsersController::class, 'login']);
+    Route::post('/login', [UsersController::class, 'login']);//->name('login');
     Route::put('/register', [UsersController::class, 'register']);
     Route::post('/recoverPass', [UsersController::class, 'recoverPass']);
 });
